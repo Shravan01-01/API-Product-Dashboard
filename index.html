@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f7f8fa" />
+    <meta name="description" content="Browse a live collection of products in the Northstar product dashboard." />
+    <title>Northstar — Product dashboard</title>
+    <link rel="preconnect" href="https://fakestoreapi.com" />
+    <link rel="preconnect" href="https://fakestoreapi.com" crossorigin />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Main navigation">
+        <a class="brand" href="#" aria-label="Northstar home">
+          <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m12 2 2.3 7.7L22 12l-7.7 2.3L12 22l-2.3-7.7L2 12l7.7-2.3L12 2Z"/></svg></span>
+          <span>northstar</span>
+        </a>
+        <div class="nav-label">WORKSPACE</div>
+        <nav>
+          <a class="nav-item active" href="#products" aria-current="page"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span>Products</span><span class="nav-count" id="nav-count">—</span></a>
+          <a class="nav-item muted" href="#categories" id="categories-link"><svg viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h16"/><circle cx="8" cy="5" r="1.5"/><circle cx="16" cy="12" r="1.5"/><circle cx="10" cy="19" r="1.5"/></svg><span>Categories</span></a>
+        </nav>
+        <div class="sidebar-bottom"><div class="status-dot"></div><span>Live product feed</span></div>
+      </aside>
+
+      <main class="main-content" id="products">
+        <header class="topbar"><div class="breadcrumbs"><span>Workspace</span><span class="crumb-divider">/</span><strong>Products</strong></div><div class="topbar-right"><span class="topbar-date" id="today-date"></span><span class="avatar" aria-label="Account: Alex Morgan">AM</span></div></header>
+        <section class="page-heading">
+          <div><div class="eyebrow"><span class="eyebrow-line"></span> CATALOG OVERVIEW</div><h1>Products</h1><p class="subtitle">A clear view of everything in your catalog.</p></div>
+          <button class="refresh-button" id="refresh-button" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.6 9a7 7 0 0 1 11.7-2L20 12M4 12l2.7 5a7 7 0 0 0 11.7-2"/></svg><span>Refresh data</span></button>
+        </section>
+
+        <section class="stats-grid" aria-label="Catalog summary">
+          <article class="stat-card"><div class="stat-top"><span class="stat-label">TOTAL PRODUCTS</span><span class="stat-icon lavender"><svg viewBox="0 0 24 24"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Z"/><path d="m4.5 7.7 7.5 4.2 7.5-4.2M12 12v9"/></svg></span></div><div class="stat-value" id="total-stat">—</div><div class="stat-note"><span class="live-indicator"></span>Products in catalog</div></article>
+          <article class="stat-card"><div class="stat-top"><span class="stat-label">CATEGORIES</span><span class="stat-icon mint"><svg viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h16"/><circle cx="8" cy="5" r="1.5"/><circle cx="16" cy="12" r="1.5"/><circle cx="10" cy="19" r="1.5"/></svg></span></div><div class="stat-value" id="category-stat">—</div><div class="stat-note">Distinct collections</div></article>
+          <article class="stat-card"><div class="stat-top"><span class="stat-label">AVERAGE PRICE</span><span class="stat-icon peach"><svg viewBox="0 0 24 24"><path d="M12 2v20M17 6H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span></div><div class="stat-value" id="average-stat">—</div><div class="stat-note">Across all products</div></article>
+        </section>
+
+        <section class="catalog-section" aria-label="Product catalog">
+          <div class="catalog-header"><div><h2>All products <span class="section-count" id="section-count">—</span></h2><p class="section-subtitle">Browse and manage your catalog</p></div></div>
+          <div class="toolbar"><label class="search-box"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="search-input" type="search" placeholder="Search products..." autocomplete="off" aria-label="Search products" /></label><label class="select-wrap"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M7 12h10m-7 7h4"/></svg><select id="category-filter" aria-label="Filter by category"><option value="all">All categories</option></select><span class="select-chevron">⌄</span></label><span class="result-count" id="result-count"></span></div>
+          <div id="content-state" aria-live="polite" aria-busy="true"></div>
+          <div class="product-grid" id="product-grid"></div>
+        </section>
+        <footer class="page-footer"><span>Northstar Product Dashboard</span><span>Data provided by <a href="https://fakestoreapi.com/" target="_blank" rel="noreferrer">Fake Store API</a></span></footer>
+      </main>
+    </div>
+  </body>
+</html>
