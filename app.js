@@ -1,4 +1,5 @@
 const API_URL = 'https://fakestoreapi.com/products';
+const FX_API_URL = 'https://api.frankfurter.dev/v2/rate/usd/inr';
 const grid = document.querySelector('#product-grid');
 const stateRegion = document.querySelector('#content-state');
 const refreshButton = document.querySelector('#refresh-button');
@@ -6,6 +7,7 @@ const searchInput = document.querySelector('#search-input');
 const categoryFilter = document.querySelector('#category-filter');
 const resultCount = document.querySelector('#result-count');
 let products = [];
+let usdToInr = 0;
 let requestController;
 
 document.querySelector('#today-date').textContent = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date());
@@ -49,32 +51,43 @@ async function loadProducts() {
   setBusy(true);
   showLoading();
   try {
-    const response = await fetch(API_URL, { signal: controller.signal, headers: { Accept: 'application/json' } });
+    const [response, rateResponse] = await Promise.all([
+      fetch(API_URL, { signal: controller.signal, headers: { Accept: 'application/json' } }),
+      fetch(FX_API_URL, { signal: controller.signal, headers: { Accept: 'application/json' } })
+    ]);
     if (!response.ok) throw new Error(response.status === 429 ? 'The service is receiving too many requests right now.' : `The product service responded with an error (HTTP ${response.status}).`);
-    let data;
-    try { data = await response.json(); }
+    if (!rateResponse.ok) throw new Error(`The USD to INR exchange rate service responded with an error (HTTP ${rateResponse.status}).`);
+    let data, rateData;
+    try { [data, rateData] = await Promise.all([response.json(), rateResponse.json()]); }
     catch { throw new Error('The product service sent a response we could not read.'); }
     products = validateProducts(data);
     if (products.length === 0) throw new Error('The product service returned an empty catalog.');
+    if (!rateData || !Number.isFinite(Number(rateData.rate)) || Number(rateData.rate) <= 0) throw new Error('The exchange rate service returned an invalid USD to INR rate.');
+    usdToInr = Number(rateData.rate);
     stateRegion.innerHTML = '';
-    updateSummary();
+    updateSummary(rateData.date);
     updateCategoryOptions();
     renderProducts();
   } catch (error) {
     if (error.name === 'AbortError') return;
-    const message = error instanceof TypeError ? 'We could not reach the product service. It may be temporarily unavailable.' : error.message || 'An unexpected problem occurred.';
+    const message = error instanceof TypeError ? 'We could not reach the product or exchange rate service. One of them may be temporarily unavailable.' : error.message || 'An unexpected problem occurred.';
     showError(message);
   } finally {
     if (requestController === controller) setBusy(false);
   }
 }
 
-function updateSummary() {
+function formatINR(amount) {
+  return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount);
+}
+
+function updateSummary(rateDate) {
   const categoryCount = new Set(products.map(product => product.category)).size;
-  const average = products.reduce((sum, product) => sum + Number(product.price), 0) / products.length;
+  const average = products.reduce((sum, product) => sum + Number(product.price) * usdToInr, 0) / products.length;
   document.querySelector('#total-stat').textContent = products.length;
   document.querySelector('#category-stat').textContent = categoryCount;
-  document.querySelector('#average-stat').textContent = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(average);
+  document.querySelector('#average-stat').textContent = formatINR(average);
+  document.querySelector('#average-note').textContent = `US$1 = ${formatINR(usdToInr)} · ${rateDate}`;
   document.querySelector('#nav-count').textContent = products.length;
   document.querySelector('#section-count').textContent = products.length;
 }
@@ -99,7 +112,7 @@ function renderProducts() {
   grid.innerHTML = filtered.map(product => {
     const rating = product.rating && Number.isFinite(Number(product.rating.rate)) ? Number(product.rating.rate).toFixed(1) : null;
     const image = typeof product.image === 'string' ? product.image : '';
-    return `<article class="product-card"><div class="product-image-wrap"><span class="product-category">${escapeHtml(product.category)}</span><img class="product-image" src="${escapeHtml(image)}" alt="${escapeHtml(product.title)}" loading="lazy"><span class="image-fallback" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m21 15-5-5L5 20"/></svg></span></div><div class="product-info"><h3 class="product-name" title="${escapeHtml(product.title)}">${escapeHtml(product.title)}</h3><div class="product-meta"><span class="product-price">${new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(Number(product.price))}</span>${rating ? `<span class="product-rating"><span class="star">★</span> ${rating}</span>` : ''}</div></div></article>`;
+    return `<article class="product-card"><div class="product-image-wrap"><span class="product-category">${escapeHtml(product.category)}</span><img class="product-image" src="${escapeHtml(image)}" alt="${escapeHtml(product.title)}" loading="lazy"><span class="image-fallback" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m21 15-5-5L5 20"/></svg></span></div><div class="product-info"><h3 class="product-name" title="${escapeHtml(product.title)}">${escapeHtml(product.title)}</h3><div class="product-meta"><span class="product-price">${formatINR(Number(product.price) * usdToInr)}</span>${rating ? `<span class="product-rating"><span class="star">★</span> ${rating}</span>` : ''}</div></div></article>`;
   }).join('');
   grid.querySelectorAll('.product-image').forEach(image => image.addEventListener('error', () => {
     image.classList.add('failed');

@@ -1,6 +1,6 @@
 # Northstar Product Dashboard
 
-A responsive product catalog dashboard powered by the browser's native Fetch API and the public [Fake Store API](https://fakestoreapi.com/).
+A responsive product catalog dashboard powered by the browser's native Fetch API, the public [Fake Store API](https://fakestoreapi.com/), and [Frankfurter exchange rates](https://frankfurter.dev/).
 
 ## Run it
 
@@ -16,7 +16,8 @@ No build step, package installation, API key, or framework is required. The dash
 
 ## Included
 
-- Dynamic product cards with image, name, category, price, and rating
+- Dynamic product cards with image, name, category, price in INR, and rating
+- USD product prices converted to rupees using the latest available daily USD/INR reference rate
 - Loading skeletons, HTTP and network error messages, and retry actions
 - Search and category filtering
 - A dedicated Categories page that groups every product into its own section
