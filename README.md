@@ -1,21 +1,24 @@
 # Northstar Product Dashboard
 
-A responsive product catalog dashboard powered by the browser Fetch API and the public [Fake Store API](https://fakestoreapi.com/).
+A responsive product catalog dashboard powered by the browser's native Fetch API and the public [Fake Store API](https://fakestoreapi.com/).
 
-## Run locally
+## Run it
 
-Python 3 is needed to serve the files over HTTP. From this folder, run:
+Because browsers restrict some requests from pages opened as `file://`, serve this folder over HTTP. With Python 3 installed, run this from the project folder:
 
 ```sh
 python3 -m http.server 8000
 ```
 
-Open [http://localhost:8000](http://localhost:8000) in your browser. No build step, package installation, or API key is required. An internet connection is needed to load product data.
+Then open [http://localhost:8000](http://localhost:8000). Stop the server with `Ctrl+C`.
 
-## Features
+No build step, package installation, API key, or framework is required. The dashboard needs an internet connection to load the live catalog.
 
-- Product cards with images, names, categories, prices, and ratings
-- Loading skeletons and network and HTTP error handling with retry
+## Included
+
+- Dynamic product cards with image, name, category, price, and rating
+- Loading skeletons, HTTP and network error messages, and retry actions
 - Search and category filtering
-- Summary cards for total products, categories, and average price
-- Responsive layout for desktop, tablet, and mobile
+- A dedicated Categories page that groups every product into its own section
+- Summary cards for product count, category count, and average price
+- Responsive layout for desktop, tablet, and mobile screens

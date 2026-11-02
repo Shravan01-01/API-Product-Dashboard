@@ -110,9 +110,4 @@ function renderProducts() {
 searchInput.addEventListener('input', renderProducts);
 categoryFilter.addEventListener('change', renderProducts);
 refreshButton.addEventListener('click', loadProducts);
-document.querySelector('#categories-link').addEventListener('click', event => {
-  event.preventDefault();
-  categoryFilter.focus();
-  categoryFilter.scrollIntoView({ behavior: 'smooth', block: 'center' });
-});
 loadProducts();
